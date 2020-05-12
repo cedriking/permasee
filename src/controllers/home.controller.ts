@@ -1,4 +1,4 @@
-import * as express from 'express';
+import express from 'express';
 import { Request, Response } from 'express';
 import IControllerBase from '../interfaces/icontrollerbase.interface';
 import moment from 'moment';
@@ -7,6 +7,7 @@ import TransactionService from '../services/transaction';
 import { PoolService } from '../services/pool';
 import { TransactionModel } from '../models/transaction.model';
 import { GrabberStatsModel } from '../models/grabber.model';
+import cacheMiddleware from '../middleware/cache';
 
 moment.locale();
 
@@ -19,7 +20,7 @@ class HomeController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get('/', (req: Request, res: Response) => {
+        this.router.get('/', cacheMiddleware((60 * 60)), (req: Request, res: Response) => {
             this.index(req, res);
         });
     }
@@ -36,9 +37,9 @@ class HomeController implements IControllerBase {
         if(req.query && req.query.search) {
             rendering['searchTerm'] = req.query.search;
 
-            // TODO: Do search and add to rendering
+            // Do search and add to rendering
             const searchResult = await this.search(req.query.search.toString());
-            console.log(searchResult);
+            //console.log(searchResult);
             rendering['searchResult'] = searchResult;
         }
 

@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "express-minify": "^1.0.0",
     "helmet": "^3.22.0",
+    "memory-cache": "^0.2.0",
     "method-override": "^3.0.0",
     "moment": "^2.25.3",
     "mongoose": "^5.9.10",

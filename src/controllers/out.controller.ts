@@ -1,14 +1,6 @@
-import * as express from 'express';
+import express from 'express';
 import { Request, Response } from 'express';
 import IControllerBase from '../interfaces/icontrollerbase.interface';
-import moment from 'moment';
-import fs from 'fs';
-import TransactionService from '../services/transaction';
-import { PoolService } from '../services/pool';
-import { TransactionModel } from '../models/transaction.model';
-import { GrabberStatsModel } from '../models/grabber.model';
-
-moment.locale();
 
 class OutController implements IControllerBase {
     public path = '/out';
