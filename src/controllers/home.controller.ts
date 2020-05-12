@@ -44,8 +44,6 @@ class HomeController implements IControllerBase {
         }
 
         const grabberStats = await GrabberStatsModel.findOne({});
-        rendering['serverTime'] = moment(new Date().getTime()).format('LLL');
-        rendering['updatedTime'] = moment(new Date(grabberStats.updatedAt).getTime()).format('LLL');
         rendering['currentBlock'] = grabberStats.currentBlock;
         rendering['moment'] = moment;
 
