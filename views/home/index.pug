@@ -1,0 +1,122 @@
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1')
+  meta(name='description' content='Search the permaweb (Arweave) for all deployed and archived webpages.')
+  title PermaSE | Arweave's permaweb search engine
+  link(rel='apple-touch-icon' sizes='57x57' href='images/icon/apple-icon-57x57.png')
+  link(rel='apple-touch-icon' sizes='60x60' href='images/icon/apple-icon-60x60.png')
+  link(rel='apple-touch-icon' sizes='72x72' href='images/icon/apple-icon-72x72.png')
+  link(rel='apple-touch-icon' sizes='76x76' href='images/icon/apple-icon-76x76.png')
+  link(rel='apple-touch-icon' sizes='114x114' href='images/icon/apple-icon-114x114.png')
+  link(rel='apple-touch-icon' sizes='120x120' href='images/icon/apple-icon-120x120.png')
+  link(rel='apple-touch-icon' sizes='144x144' href='images/icon/apple-icon-144x144.png')
+  link(rel='apple-touch-icon' sizes='152x152' href='images/icon/apple-icon-152x152.png')
+  link(rel='apple-touch-icon' sizes='180x180' href='images/icon/apple-icon-180x180.png')
+  link(rel='icon' type='image/png' sizes='192x192' href='images/icon/android-icon-192x192.png')
+  link(rel='icon' type='image/png' sizes='32x32' href='images/icon/favicon-32x32.png')
+  link(rel='icon' type='image/png' sizes='96x96' href='images/icon/favicon-96x96.png')
+  link(rel='icon' type='image/png' sizes='16x16' href='images/icon/favicon-16x16.png')
+  link(rel='manifest' href='images/icon/manifest.json')
+  meta(name='msapplication-TileColor' content='#ffffff')
+  meta(name='msapplication-TileImage' content='images/icon/ms-icon-144x144.png')
+  meta(name='theme-color' content='#ffffff')
+
+  link(rel="stylesheet", href="styles/terminal.css")
+  link(rel="stylesheet", href="styles/main.css")
+
+  if darkmodeCSS
+    style= darkmodeCSS
+body
+  .container
+    .terminal-nav
+      header.terminal-logo
+        .logo.terminal-prompt
+          a(href="/").no-style SEARCH THE PERMAWEB
+      
+      nav.terminal-menu
+        ul(vocab="https://schema.org/" typeof="BreadcrumbList")
+          li
+            a(href=searchTerm? `?search=${searchTerm}&theme=light`: "?theme=light", class=darkmodeCSS ? '' : 'active').menu-item
+              span Light
+              meta(property="position")
+          li(property="itemListElement" typeof="ListItem")
+            a(href=searchTerm? `?search=${searchTerm}&theme=dark`: "?theme=dark", property="item" typeOf="WebPage" class=darkmodeCSS? 'active' : '').menu-item
+              span(property="name") Dark
+              meta(property="position" content="1")
+  
+  .container
+    section.search
+      form(method="get")
+        .form-group
+          label(for="search") Search:
+          input(id="search", name="search", type="text", value=searchTerm)
+
+        if searchResult
+          .results-sort
+            | Order by: 
+            a.active(href=`?search=${searchTerm}&sort=date`)=' Date '
+            | |
+            a(href=`?search=${searchTerm}&sort=type`)=' Type '
+            | |
+            a(href=`?search=${searchTerm}&sort=owner`)=' Owner '
+
+        .form-group
+          button(type="submit", role="button").btn.btn-default Search
+  if !searchResult
+    .container
+      section.description
+        p PermaSE is a privacy focused search engine that allows you to search for any webpage stored on  
+          a(href="https://arweave.org" target="_blank") Arweave
+          | 's permaweb.
+          br
+          | You can search with origin URL (archived content), TXID, page title/content, or AR wallet address.
+
+  if searchResult
+    .container
+      section.results
+        if searchResult.length
+          each obj, index in searchResult
+            - var isArchive = !!obj.es.tags['page:url']
+            h2.result-title.sl
+              span(class=isArchive? 'cat-archive' : 'cat-dapp')= isArchive? '[Archive] ' : '[Deploy] '
+              = obj.es.title
+            ul.result-description
+              li.sl Permaweb: 
+                a(href=`/out/?id=${obj.tx.id}`)= obj.tx.id
+              if isArchive
+                li(style="width: 70%").sl Source: 
+                  a(href=`/out/?id=${obj.tx.id}&source=${obj.es.tags['page:url']}`).secondary-color= obj.es.tags['page:url']
+              li
+                = isArchive? 'Archived ' : 'Deployed '
+                | by: 
+                a(href=`/?search=${obj.tx.owner}`).secondary-color= obj.tx.owner
+              li
+                = isArchive? 'Archived ' : 'Deployed '
+                | date:
+                span.secondary-color  #{moment(obj.tx.createdAt).format('LLL')}
+              
+
+        if !searchResult.length
+          p Nothing found for this search query.
+
+    
+  .container
+    footer.footer
+      section
+        p.right Block Height: #{currentBlock}
+        p Server Time: #{serverTime} 
+          br
+          | Last Update: #{updatedTime}
+        p
+          | Built with &hearts; by 
+          a(target='_blank', href='https://github.com/Cedriking') Cedriking
+          | . 
+          a(href='https://arweave.net/27WsYOcNHWweInDArUK94_GsBeuQKPXalsnwVPPRfe4?to=BPr7vrFduuQqqVMu_tftxsScTKUq9ke0rx4q5C9ieQU', target="_blankß") Contact Me
+          |  with Weavemail. Source code available on 
+          a(href='https://github.com/Cedriking/permanent', target="_blank") Github
+          | .
+
+        p Icons made by <a href="https://www.flaticon.com/authors/icongeek26" title="Icongeek26" target="_blank">Icongeek26</a> from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank"> www.flaticon.com</a>
+
+  script(src="scripts/app.js")

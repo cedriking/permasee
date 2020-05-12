@@ -1,0 +1,44 @@
+.result-title {
+    margin-bottom: 0;
+}
+.result-description {
+    margin-top: 0;
+}
+
+footer {
+    border-top: 1px solid;
+    margin-top: 40px;
+    padding-top: 5px;
+}
+
+.sl {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+}
+
+.secondary-color {
+    color: var(--secondary-color);
+}
+
+.cat-archive {
+    color: #a3abba98;
+}
+.cat-dapp {
+    color: #ff326d98;
+}
+
+.results-sort, .right {
+    float: right;
+}
+
+.results-sort a.active {
+    color: var(--font-color);
+}
+.results-sort a.active:hover {
+    color: var(--invert-font-color);
+}
+.center-align {
+    text-align: center;
+}
