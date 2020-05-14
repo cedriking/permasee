@@ -7,4 +7,6 @@ MONGO_URL=<mongodb url>
 ELASTICSEARCH_HOSTS=<elasticsearch url>
 ARWEAVE_NODE_URL=<arweave node url>
 REDIS_URL=<redis caching, optional, fallback to memory cache>
+POOL_THREADS=<number, amount of threads to run to get blocks and transactions>
+NEWRELIC_KEY=<optional, newrelic key>
 ```

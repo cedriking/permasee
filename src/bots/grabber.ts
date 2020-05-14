@@ -59,13 +59,13 @@ class Grabber {
         for(let i = 0, j = transactions.length; i < j; i++) {
             pool.add(async () => TransactionService.saveTransaction(transactions[i]));
         }
-        await pool.run(10);
+        await pool.run(+process.env.POOL_THREADS);
         return this.newBlock(end);
     }
 
     async newBlock(increment: number = 0) {
         if(increment) await this.stats.updateCurrentBlock(increment);
-        await UtilsService.pause(10);
+        await UtilsService.pause(+process.env.POOL_THREADS);
         return this.getBlockDetails();
     }
 }

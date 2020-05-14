@@ -10,7 +10,7 @@ class BlockService {
         return ArRequestService.get(`/block/height/${height}`);
     }
 
-    static async getBlocksByHeight(startingHeight: number, endHeight: number, threads: number = 5): Promise<IBlock[]> {
+    static async getBlocksByHeight(startingHeight: number, endHeight: number): Promise<IBlock[]> {
         const pool = new PoolService();
 
         let grabbed = 0;
@@ -32,13 +32,13 @@ class BlockService {
             pool.add(() => get(i));
         }
 
-        const result:IBlock[] = await pool.run(threads);
+        const result:IBlock[] = await pool.run(+process.env.POOL_THREADS);
         await UtilsService.stopLine();
 
         return result;
     }
 
-    static async getBlockTxsWithType(blocks: IBlock[], contentType: string, threads: number = 10): Promise<ITransaction[]> {
+    static async getBlockTxsWithType(blocks: IBlock[], contentType: string): Promise<ITransaction[]> {
         const pool = new PoolService();
 
         let transactions: ITransaction[] = [];
@@ -61,7 +61,7 @@ class BlockService {
                 pool.add(() => get(blocks[i]));
             }
         }
-        await pool.run(threads);
+        await pool.run(+process.env.POOL_THREADS);
         return transactions;
     }
 }

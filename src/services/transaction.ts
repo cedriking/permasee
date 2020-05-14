@@ -126,7 +126,7 @@ class TransactionService {
             pool.add(async () => go(i));
         }
 
-        await pool.run(5);
+        await pool.run(+process.env.POOL_THREADS);
         await UtilsService.stopLine();
         await UtilsService.pause(300);
 
