@@ -1,6 +1,7 @@
-import App from './app'
+import "newrelic";
+import App from './app';
 
-import bodyParser from 'body-parser'
+import bodyParser from 'body-parser';
 import compress from "compression";
 import cookieParser from "cookie-parser";
 import methodOverride from "method-override";

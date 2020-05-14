@@ -39,7 +39,7 @@ class HomeController implements IControllerBase {
 
             // Do search and add to rendering
             const searchResult = await this.search(req.query.search.toString());
-            //console.log(searchResult);
+            console.log(searchResult);
             rendering['searchResult'] = searchResult;
         }
 

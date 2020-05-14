@@ -25,10 +25,11 @@
     "express": "^4.17.1",
     "express-minify": "^1.0.0",
     "helmet": "^3.22.0",
-    "memored": "^1.1.1",
+    "memory-cache": "^0.2.0",
     "method-override": "^3.0.0",
     "moment": "^2.25.3",
     "mongoose": "^5.9.10",
+    "newrelic": "^6.7.0",
     "node-cache-redis": "^2.14.0",
     "pug": "^2.0.4",
     "terminal.css": "^0.7.1"
