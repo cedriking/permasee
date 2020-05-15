@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
-import esClient from '../services/elastic';
 import { GrabberStatsModel, GrabberStats } from '../models/grabber.model';
 import { IArweaveInfo } from '../interfaces/iarweaveinfo.interface';
 import ArRequestService from '../services/arRequest';
