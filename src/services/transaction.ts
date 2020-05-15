@@ -5,7 +5,6 @@ import { PoolService } from "./pool";
 import { DBTransaction, TransactionModel } from "../models/transaction.model";
 import esClient from "./elastic";
 import Transaction from "arweave/node/lib/transaction";
-import cheerio from 'cheerio';
 
 class TransactionService {
     private threads = 5;
@@ -164,12 +163,27 @@ class TransactionService {
     }
 
     static async saveToElastic(transaction: ITransaction) {
-        const $ = cheerio.load(transaction.data);
+        let title = '';
+        try {
+            title = transaction.data.toString().match(/<title[^>]*>([^<]+)<\/title>/)[1];
+        } catch(e) {}
+
+        let description = '';
+        try {
+            description = transaction.data.toString().match(/meta name="description" content="(.*)"/i)[1];
+        } catch(e) {}
+
+        let body = transaction.data.toString().match(/<body[^>]*>(.*?)<\/body>/is)[1];
+        body = body.replace(/&nbsp;/g, ' ');
+        body = body.replace(/<[^>]*(>|$)|&zwnj;|&raquo;|&laquo;|&gt;/g, '');
+        body = body.replace(/  +/g, ' ');
+        body = body.replace(/\n+/g, '\n');
+        body = body.replace(/\t+/g, '\t');
 
         const txData = {
-            title: $('title').text(),
-            description: $('meta[name="description"]').attr('content') || '',
-            body: $('body').text(),
+            title,
+            description,
+            body,
             txid: transaction.id,
             owner: transaction.owner,
             tags: transaction.tags
