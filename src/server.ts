@@ -1,4 +1,3 @@
-import "newrelic";
 import App from './app';
 
 import bodyParser from 'body-parser';
