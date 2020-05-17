@@ -1,3 +1,8 @@
+import Sentry from '@sentry/node';
+try {
+    Sentry.init({dsn: process.env.SENTRY_URL});
+} catch(e) {}
+
 import App from './app';
 
 import bodyParser from 'body-parser';
@@ -23,6 +28,7 @@ const app = new App({
         new HomeController()
     ],
     middleWares: [
+        Sentry.Handlers.requestHandler(),
         helmet(),
         cookieParser(),
         compress({}),
@@ -34,4 +40,5 @@ const app = new App({
     ]
 });
 
+app.app.use(Sentry.Handlers.errorHandler());
 app.listen();
