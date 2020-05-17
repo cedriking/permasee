@@ -173,7 +173,15 @@ class TransactionService {
             description = transaction.data.toString().match(/meta name="description" content="(.*)"/i)[1];
         } catch(e) {}
 
-        let body = transaction.data.toString().match(/<body[^>]*>(.*?)<\/body>/is)[1];
+        let body = '';
+        try {
+            body = transaction.data.toString().match(/<body[^>]*>(.*?)<\/body>/is)[1];
+        } catch(e) {
+            if(!title.length) {
+                body = transaction.data.toString();
+            }
+        }
+
         body = body.replace(/&nbsp;/g, ' ');
         body = body.replace(/<[^>]*(>|$)|&zwnj;|&raquo;|&laquo;|&gt;/g, '');
         body = body.replace(/  +/g, ' ');
