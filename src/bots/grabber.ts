@@ -1,9 +1,15 @@
+import Sentry from '@sentry/node';
+
+try {
+    Sentry.init({ dsn: process.env.SENTRY_URL });
+} catch(e) {}
+
 import mongoose from 'mongoose';
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
 import { GrabberStatsModel, GrabberStats } from '../models/grabber.model';
 import { IArweaveInfo } from '../interfaces/iarweaveinfo.interface';
-import ArRequestService from '../services/arRequest';
+import { arRequestService } from '../services/arRequest';
 import BlockService from '../services/block';
 import TransactionService from '../services/transaction';
 import UtilsService from '../services/utils';
@@ -25,11 +31,12 @@ class Grabber {
         }
         this.stats = statsModel;
 
-        // TODO: Grab current block height
-        const res:IArweaveInfo = await ArRequestService.get('/info');
-        if(res) {
-            this.nodeHeight = res.height;
+        // Grab current block height
+        const info: IArweaveInfo = await arRequestService.getInfo();
+        if(!info) {
+            return false;
         }
+        this.nodeHeight = info.height;
 
         // Start looking into each missing block
         return this.getBlockDetails(true);

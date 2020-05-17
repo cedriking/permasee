@@ -1,27 +1,94 @@
-import Arweave from 'arweave/node';
-
-let ar: Arweave;
-if(process.env.ARWEAVE_NODE_URL) {
-    const regex = /(https?):\/\/([\w\d\.]+):?(\d+)?/;
-    const fragments = process.env.ARWEAVE_NODE_URL.match(regex);
-
-    ar = Arweave.init({ host: fragments[2], protocol: fragments[1], port: fragments[1] === 'https'? 443 : (fragments.length === 4? fragments[3] : '80') });
-} else {
-    ar = Arweave.init({ host: 'arweave.net', protocol: 'https', port: 443 });
-}
-
-export const arweave = ar;
+import axios from 'axios';
+import { IArweaveInfo } from '../interfaces/iarweaveinfo.interface';
+import { Cache } from '../middleware/cache';
+import { PoolService } from './pool';
 
 class ArRequestService {
-    static async get(endpoint: string): Promise<any> {
-        const res = await arweave.api.get(endpoint);
+    private mainPeer: string = '';
+    private peers: string[] = [];
+    private cache: Cache;
+
+    constructor() {
+        this.cache = new Cache(120); // 2 minutes
+
+        if(process.env.ARWEAVE_NODE_URL) {
+            this.mainPeer = process.env.ARWEAVE_NODE_URL;
+        } else {
+            this.mainPeer = 'https://arweave.net';
+        }
+        this.peers = [this.mainPeer];
+
+        // Grab peers
+        setTimeout(() => this.setPeers(), 1000);
+    }
+
+    async get(endpoint: string): Promise<any> {
+        const peer = this.peers[Math.floor(Math.random() * this.peers.length)];
+
+        const res = await axios(`${peer}${endpoint}`);
         if(res.status === 200) {
             return res.data;
         }
-        
-        console.log(res);
+
         return false;
+    }
+
+    async getInfo(): Promise<IArweaveInfo> {
+        const cached = await this.cache.get('arRequest_getInfo');
+        if(cached) {
+            return cached;
+        }
+
+        const res = await axios(`${this.mainPeer}/info`);
+        if(res.data && res.data.height) {
+            await this.cache.set('arRequest_getInfo', res.data);
+            return res.data;
+        }
+
+        return;
+    }
+
+    private async setPeers() {
+        const tmpPeer: string[] = [this.mainPeer];
+
+        const res = await axios(`${this.mainPeer}/peers`);
+        if(res.status !== 200) {
+            return false;
+        }
+
+        const height = (await this.getInfo()).height;
+        const go = async (index = 0) => {
+            const peer = `http://${res.data[index]}`;
+            try {
+                const cancelToken = axios.CancelToken.source();
+                setTimeout(() => {
+                    try {
+                        cancelToken.cancel();
+                    } catch(e) {}
+                }, 1000);
+                const r = await axios.get(`${peer}/info`, {timeout: 500, cancelToken: cancelToken.token});
+                if(r && r.data && r.data.height && (r.data.height >= (height-5))) {
+                    tmpPeer.push(peer);
+                    return peer;
+                }
+            } catch(e) {}
+
+            return;
+        }
+
+        const pool = new PoolService();
+        for(let i = 0, j = res.data.length; i < j; i++) {
+            pool.add(() => go(i));
+        }
+
+        await pool.run(+process.env.POOL_THREADS);
+        this.peers = tmpPeer;
+
+        console.log(`Peers updated, total peers: ${this.peers.length}`);
+        setTimeout(() => this.setPeers(), 60000*10);
+
+        return true;
     }
 }
 
-export default ArRequestService;
+export const arRequestService = new ArRequestService();

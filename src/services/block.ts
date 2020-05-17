@@ -1,5 +1,5 @@
 import IBlock from "../interfaces/iblock.interface";
-import ArRequestService from "./arRequest";
+import { arRequestService } from "./arRequest";
 import { PoolService } from "./pool";
 import ITransaction from "../interfaces/transaction.interface";
 import TransactionService from "./transaction";
@@ -7,7 +7,7 @@ import UtilsService from "./utils";
 
 class BlockService {
     static async getByHeight(height: number): Promise<IBlock> {
-        return ArRequestService.get(`/block/height/${height}`);
+        return arRequestService.get(`/block/height/${height}`);
     }
 
     static async getBlocksByHeight(startingHeight: number, endHeight: number): Promise<IBlock[]> {

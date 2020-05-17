@@ -1,10 +1,11 @@
-import ArRequestService, { arweave } from "./arRequest";
+import { arRequestService } from "./arRequest";
 import ITransaction from "../interfaces/transaction.interface";
 import UtilsService from "./utils";
 import { PoolService } from "./pool";
 import { DBTransaction, TransactionModel } from "../models/transaction.model";
 import esClient from "./elastic";
 import Transaction from "arweave/node/lib/transaction";
+import Arweave from "arweave/node";
 
 class TransactionService {
     private threads = 5;
@@ -14,7 +15,7 @@ class TransactionService {
     }
 
     async getByTxId(txid: string): Promise<Transaction> {
-        return arweave.transactions.get(txid);
+        return arRequestService.get(`/tx/${txid}`);
     }
 
     async getTxDetails(txid: string): Promise<ITransaction> {
@@ -28,7 +29,7 @@ class TransactionService {
             } catch(e) {}
         }
         
-        const owner = await arweave.wallets.ownerToAddress(tx.owner);
+        const owner = await (Arweave.init({})).wallets.ownerToAddress(tx.owner);
         const tags: any = {};
 
         if(tx.tags && tx.tags.length) {
