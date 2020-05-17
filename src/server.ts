@@ -20,6 +20,18 @@ import mongoose from 'mongoose';
 import OutController from './controllers/out.controller';
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
+let middleWares = [helmet(),
+    cookieParser(),
+    compress({}),
+    minify({ cache: path.join(__dirname, 'cache') }),
+    methodOverride(),
+    bodyParser.json(),
+    bodyParser.urlencoded({ extended: true }),
+    loggerMiddleware];
+
+if(Sentry) {
+    middleWares = [ Sentry.Handlers.requestHandler() ].concat(middleWares);
+}
 
 const app = new App({
     port: 5000,
@@ -27,18 +39,10 @@ const app = new App({
         new OutController(),
         new HomeController()
     ],
-    middleWares: [
-        Sentry.Handlers.requestHandler(),
-        helmet(),
-        cookieParser(),
-        compress({}),
-        minify({ cache: path.join(__dirname, 'cache') }),
-        methodOverride(),
-        bodyParser.json(),
-        bodyParser.urlencoded({ extended: true }),
-        loggerMiddleware
-    ]
+    middleWares
 });
 
-app.app.use(Sentry.Handlers.errorHandler());
+if(Sentry) {
+    app.app.use(Sentry.Handlers.errorHandler());
+}
 app.listen();
