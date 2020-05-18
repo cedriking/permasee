@@ -20,32 +20,27 @@ class TransactionService {
 
     async getTxDetails(txid: string): Promise<ITransaction> {
         const tx: Transaction = await this.getByTxId(txid);
-        const signature = tx.get('signature');
         let data: string = '';
 
         if(tx.data && tx.data.length) {
             try {
-                data = tx.get('data', {decode: true, string: true});
+                data = Buffer.from(tx.data, 'base64').toString('utf8');
             } catch(e) {}
         }
         
-        const owner = await (Arweave.init({})).wallets.ownerToAddress(tx.owner);
+        const owner = await Arweave.utils.bufferTob64Url(await Arweave.crypto.hash(Arweave.utils.b64UrlToBuffer(tx.owner)));
         const tags: any = {};
 
         if(tx.tags && tx.tags.length) {
-            // @ts-ignore
-            tx.get('tags').forEach(tag => {
-                try {
-                    const name = tag.get('name', {decode: true, string: true});
-                    const value = tag.get('value', {decode: true, string: true});
-                    tags[name] = value;
-                } catch(e) {}
-            });
+            for(let tag of tx.tags) {
+                const name = Buffer.from(tag['name'], 'base64').toString('utf8');
+                const value = Buffer.from(tag['value'], 'base64').toString('utf8');
+                tags[name] = value;
+            }
         }
 
         // @ts-ignore
         const transaction: ITransaction = tx;
-        transaction.signature = signature;
         transaction.data = data;
         transaction.tags = tags;
         transaction.owner = owner;
