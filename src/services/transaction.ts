@@ -93,6 +93,7 @@ class TransactionService {
         const pbar = mprogress.create(length, 0, {
             block: blockHeight
         });
+        console.log(pbar);
 
         const go = async (index = 0) => {
             if(index >= length) {
