@@ -14,7 +14,7 @@ class BlockService {
         const pool = new PoolService();
 
         let total = endHeight-startingHeight+1;
-        const pbar = new Progress.SingleBar({clearOnComplete:false, hideCursor: true}, Progress.Presets.shades_classic);
+        const pbar = new Progress.SingleBar({clearOnComplete:false, hideCursor: true, stream: process.stdout}, Progress.Presets.shades_classic);
         pbar.start(total, 0);
 
         const get = async (i:number) => {
@@ -46,7 +46,8 @@ class BlockService {
         const mprogress = new Progress.MultiBar({
             clearOnComplete: true,
             hideCursor: true,
-            format: 'Checking txs on block {block} | {bar} | {value}/{total}'
+            format: 'Checking txs on block {block} | {bar} | {value}/{total}',
+            stream: process.stdout
         }, Progress.Presets.shades_grey);
 
         const get = async (block: IBlock) => {
