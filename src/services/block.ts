@@ -23,7 +23,6 @@ class BlockService {
                 pbar.increment();
                 return block;
             } catch(e) {
-                if(!e.message.includes('404')) console.log(e);
                 return get(i);
             }
         };
