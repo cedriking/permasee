@@ -4,6 +4,7 @@ import { PoolService } from "./pool";
 import ITransaction from "../interfaces/transaction.interface";
 import TransactionService from "./transaction";
 import UtilsService from "./utils";
+import Progress from 'cli-progress';
 
 class BlockService {
     static async getByHeight(height: number): Promise<IBlock> {
@@ -13,17 +14,17 @@ class BlockService {
     static async getBlocksByHeight(startingHeight: number, endHeight: number): Promise<IBlock[]> {
         const pool = new PoolService();
 
-        let grabbed = 0;
         let total = endHeight-startingHeight+1;
+        const pbar = new Progress.SingleBar({clearOnComplete:false, hideCursor: true}, Progress.Presets.shades_classic);
+        pbar.start(total, 0);
+
         const get = async (i:number) => {
             try {
                 const block = await BlockService.getByHeight(i);
-
-                grabbed++;
-                await UtilsService.updateLine(`-- Getting blocks (${parseInt(((grabbed)/total*100).toString())}%)`);
+                pbar.increment();
                 return block;
             } catch(e) {
-                console.log(e);
+                if(!e.message.includes('404')) console.log(e);
                 return get(i);
             }
         };
@@ -33,7 +34,7 @@ class BlockService {
         }
 
         const result:IBlock[] = await pool.run(+process.env.POOL_THREADS);
-        await UtilsService.stopLine();
+        pbar.stop();
 
         return result;
     }
@@ -42,9 +43,16 @@ class BlockService {
         const pool = new PoolService();
 
         let transactions: ITransaction[] = [];
+
+        const mprogress = new Progress.MultiBar({
+            clearOnComplete: true,
+            hideCursor: true,
+            format: 'Checking txs on block {block} | {bar} | {value}/{total}'
+        }, Progress.Presets.shades_grey);
+
         const get = async (block: IBlock) => {
             const transactionService = new TransactionService();
-            const tmpTxs: ITransaction[] = await transactionService.getTxsWithContentType(block.txs, 'text/html', block.height);
+            const tmpTxs: ITransaction[] = await transactionService.getTxsWithContentType(block.txs, 'text/html', block.height, mprogress);
 
             const update = (i: number) => {
                 tmpTxs[i].block_height = block.height;
@@ -69,6 +77,8 @@ class BlockService {
             }
         }
         await pool.run(+process.env.POOL_THREADS);
+        mprogress.stop();
+
         return transactions;
     }
 }

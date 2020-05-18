@@ -6,6 +6,7 @@ import { DBTransaction, TransactionModel } from "../models/transaction.model";
 import esClient from "./elastic";
 import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave/node";
+import Progress from 'cli-progress';
 
 class TransactionService {
     private threads = 5;
@@ -63,10 +64,15 @@ class TransactionService {
                 if(!transactions[i]) continue;
 
                 pool.add(async () => {
-                    const tx = await this.getTxDetails(transactions[i]);
-                    if(tx) result.push(tx);
+                    try {
+                        const tx = await this.getTxDetails(transactions[i]);
+                        if(tx) result.push(tx);
+                        return tx;
+                    } catch(e) {
+                        if(!e.message.includes('404')) console.log(e);
+                    }
                     
-                    return tx;
+                    return false;
                 });
             }
 
@@ -80,10 +86,13 @@ class TransactionService {
         return result;
     }
 
-    async getTxsWithContentType(transactions: string[], contentType: string|string[], blockHeight: number): Promise<ITransaction[]> {
+    async getTxsWithContentType(transactions: string[], contentType: string|string[], blockHeight: number, mprogress?: Progress): Promise<ITransaction[]> {
         const length = transactions.length;
         const result: ITransaction[] = [];
-        let tested = 0;
+
+        const pbar = mprogress.create(length, 0, {
+            block: blockHeight
+        });
 
         const go = async (index = 0) => {
             if(index >= length) {
@@ -104,13 +113,12 @@ class TransactionService {
                     }
                 }
             } catch(e) {
-                console.log(e);
+                if(!e.message.includes('404')) console.log(e);
                 await UtilsService.pause(300);
                 return go(index);
             }
 
-            tested++;
-            await UtilsService.updateLine(`-- Tested tx ${tested}/${length} on block ${blockHeight} (${parseInt(((tested)/length*100).toString())}%)`);
+            pbar.increment();
             return true;
         }
 
@@ -120,7 +128,8 @@ class TransactionService {
         }
 
         await pool.run(+process.env.POOL_THREADS);
-        await UtilsService.stopLine();
+        pbar.stop();
+        mprogress.remove(pbar);
         await UtilsService.pause(300);
 
      

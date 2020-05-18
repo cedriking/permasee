@@ -23,14 +23,23 @@ class ArRequestService {
     }
 
     async get(endpoint: string): Promise<any> {
-        const peer = this.peers[Math.floor(Math.random() * this.peers.length)];
+        const peerIndex = Math.floor(Math.random() * this.peers.length);
+        const peer = this.peers[peerIndex];
 
-        const res = await axios(`${peer}${endpoint}`);
-        if(res.status === 200) {
-            return res.data;
-        }
-
-        return false;
+        return new Promise((resolve, reject) => {
+            axios(`${peer}${endpoint}`).then(res => {
+                if(res.status === 200) {
+                    return resolve(res.data);
+                }
+                resolve(false);
+            }).catch(e => {
+                if(e.code === 'ENETUNREACH') {
+                    this.peers.splice(peerIndex, 1);
+                    return reject();
+                }
+                reject(e);
+            });
+        });
     }
 
     async getInfo(): Promise<IArweaveInfo> {

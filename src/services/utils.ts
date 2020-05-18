@@ -6,17 +6,6 @@ class UtilsService {
             setTimeout(() => resolve(), timeout);
         });
     }
-
-    static async updateLine(str: string) {
-        // @ts-ignore
-        readline.clearLine(process.stdout);
-        readline.cursorTo(process.stdout, 0);
-        process.stdout.write(str);
-    }
-
-    static async stopLine() {
-        process.stdout.write('\n');
-    }
 }
 
 export default UtilsService;
