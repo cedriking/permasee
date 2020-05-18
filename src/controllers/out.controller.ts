@@ -1,6 +1,8 @@
 import express from 'express';
 import { Request, Response } from 'express';
 import IControllerBase from '../interfaces/icontrollerbase.interface';
+import { arRequestService } from '../services/arRequest';
+import TransactionService from '../services/transaction';
 
 class OutController implements IControllerBase {
     public path = '/out';
@@ -20,13 +22,14 @@ class OutController implements IControllerBase {
         const txid = req.query && req.query.id;
         const source = req.query && req.query.source;
 
-        console.log(txid, source);
         if(source && source.length) {
             // TODO: count stats for permaweb
-            res.redirect(source.toString());
-        } else {
+            const r = await TransactionService.search(source.toString(), 0, 1, ['txid']);
+            console.log(r.hits[0]['_source'].tags['page:url']);
+            return res.redirect(r.hits[0]['_source'].tags['page:url']);
+        } else if(txid && txid.length) {
             // TODO: count stats for source
-            res.redirect(`${process.env.ARWEAVE_NODE_URL}/${txid}`);
+            return res.redirect(`${arRequestService.mainPeer}/${txid}`);
         }
 
         res.redirect('/');

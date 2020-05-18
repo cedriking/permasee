@@ -86,7 +86,7 @@ body
                 a(href=`/out/?id=${obj.tx.id}`)= obj.tx.id
               if isArchive
                 li(style="width: 70%").sl Source: 
-                  a(href=`/out/?id=${obj.tx.id}&source=${obj.es.tags['page:url']}`).secondary-color= obj.es.tags['page:url']
+                  a(href=`/out/?source=${obj.tx.id}`).secondary-color= obj.es.tags['page:url']
               li
                 = isArchive? 'Archived ' : 'Deployed '
                 | by: 

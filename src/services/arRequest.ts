@@ -4,19 +4,23 @@ import { Cache } from '../middleware/cache';
 import { PoolService } from './pool';
 
 class ArRequestService {
-    private mainPeer: string = '';
+    private _mainPeer: string = '';
     private peers: string[] = [];
     private cache: Cache;
+
+    get mainPeer() {
+        return this._mainPeer;
+    }
 
     constructor() {
         this.cache = new Cache(120); // 2 minutes
 
         if(process.env.ARWEAVE_NODE_URL) {
-            this.mainPeer = process.env.ARWEAVE_NODE_URL;
+            this._mainPeer = process.env.ARWEAVE_NODE_URL;
         } else {
-            this.mainPeer = 'https://arweave.net';
+            this._mainPeer = 'https://arweave.net';
         }
-        this.peers = [this.mainPeer];
+        this.peers = [this._mainPeer];
 
         // Grab peers
         setTimeout(() => this.setPeers(), 1000);
@@ -48,7 +52,7 @@ class ArRequestService {
             return cached;
         }
 
-        const res = await axios(`${this.mainPeer}/info`);
+        const res = await axios(`${this._mainPeer}/info`);
         if(res.data && res.data.height) {
             await this.cache.set('arRequest_getInfo', res.data);
             return res.data;
@@ -58,9 +62,9 @@ class ArRequestService {
     }
 
     private async setPeers() {
-        const tmpPeer: string[] = [this.mainPeer];
+        const tmpPeer: string[] = [this._mainPeer];
 
-        const res = await axios(`${this.mainPeer}/peers`);
+        const res = await axios(`${this._mainPeer}/peers`);
         if(res.status !== 200) {
             return false;
         }

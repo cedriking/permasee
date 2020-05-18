@@ -139,7 +139,7 @@ class TransactionService {
         return result;
     }
 
-    static async search(term: string, start: number = 0, limit: number = 25) {
+    static async search(term: string, start: number = 0, limit: number = 25, fields: string[] = ['title^3', 'description^2', 'body', 'txid^4', 'owner^4']) {
         let body = {
             index: 'transactions',
             type: 'webpage',
@@ -149,7 +149,7 @@ class TransactionService {
                 query: {
                     multi_match: {
                         query: term,
-                        fields: ['title^3', 'description^2', 'body', 'txid^4', 'owner^4'],
+                        fields,
                         fuzziness: 2
                     }
                 }
