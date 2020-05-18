@@ -86,7 +86,7 @@ class TransactionService {
         return result;
     }
 
-    async getTxsWithContentType(transactions: string[], contentType: string|string[], blockHeight: number, mprogress?: Progress): Promise<ITransaction[]> {
+    async getTxsWithContentType(transactions: string[], contentType: string|string[], blockHeight: number, mprogress?: Progress.MultiBar): Promise<ITransaction[]> {
         const length = transactions.length;
         const result: ITransaction[] = [];
 

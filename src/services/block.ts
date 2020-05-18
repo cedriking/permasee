@@ -3,7 +3,6 @@ import { arRequestService } from "./arRequest";
 import { PoolService } from "./pool";
 import ITransaction from "../interfaces/transaction.interface";
 import TransactionService from "./transaction";
-import UtilsService from "./utils";
 import Progress from 'cli-progress';
 
 class BlockService {
