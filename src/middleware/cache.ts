@@ -56,7 +56,6 @@ const cacheMiddleware = (ttl: number) => async (req: Request, res: Response, nex
     try {
         const data = await cache.get(key);
         if(data && data.length) {
-            console.log(data);
             return res.send(data);
         }
     } catch(e) {
