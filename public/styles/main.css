@@ -33,6 +33,10 @@ footer {
     float: right;
 }
 
+.text-right {
+    text-align: right;
+}
+
 .results-sort a.active {
     color: var(--font-color);
 }
