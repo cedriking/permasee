@@ -93,7 +93,6 @@ class TransactionService {
         const pbar = mprogress.create(length, 0, {
             block: blockHeight
         });
-        console.log(pbar);
 
         const go = async (index = 0) => {
             if(index >= length) {
@@ -119,7 +118,7 @@ class TransactionService {
                 return go(index);
             }
 
-            pbar.increment();
+            if(pbar) pbar.increment();
             return true;
         }
 
@@ -129,8 +128,10 @@ class TransactionService {
         }
 
         await pool.run(+process.env.POOL_THREADS);
-        pbar.stop();
-        mprogress.remove(pbar);
+        if(pbar) {
+            pbar.stop();
+            mprogress.remove(pbar);
+        }
         await UtilsService.pause(300);
 
      
