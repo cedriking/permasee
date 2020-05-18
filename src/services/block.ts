@@ -46,13 +46,20 @@ class BlockService {
             const transactionService = new TransactionService();
             const tmpTxs: ITransaction[] = await transactionService.getTxsWithContentType(block.txs, 'text/html', block.height);
 
-            for(let i = 0, j = tmpTxs.length; i < j; i++) {
+            const update = (i: number) => {
                 tmpTxs[i].block_height = block.height;
                 tmpTxs[i].block_indep_hash = block.indep_hash;
                 tmpTxs[i].timestamp = block.timestamp;
                 tmpTxs[i].block_hash = block.hash;
-            }
 
+                return tmpTxs[i];
+            };
+
+            const pool = new PoolService();
+            for(let i = 0, j = tmpTxs.length; i < j; i++) {
+                pool.add(() => update(i));
+            }
+            await pool.run(+process.env.POOL_THREADS);
             transactions = transactions.concat(tmpTxs);
         }
 

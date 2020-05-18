@@ -58,19 +58,19 @@ class TransactionService {
                 return true;
             }
 
-            const promises = [];
+            const pool = new PoolService();
             for(let i = index, j = index+threads; i < j; i++) {
                 if(!transactions[i]) continue;
 
-                promises.push(new Promise(async resolve => {
+                pool.add(async () => {
                     const tx = await this.getTxDetails(transactions[i]);
                     if(tx) result.push(tx);
                     
-                    resolve();
-                }));
+                    return tx;
+                });
             }
 
-            await Promise.all(promises);
+            await pool.run(+process.env.POOL_THREADS);
 
             await UtilsService.pause(300);
             return go((index+threads));
@@ -82,8 +82,6 @@ class TransactionService {
 
     async getTxsWithContentType(transactions: string[], contentType: string|string[], blockHeight: number): Promise<ITransaction[]> {
         const length = transactions.length;
-        const threads = length < this.threads? length : this.threads;
-
         const result: ITransaction[] = [];
         let tested = 0;
 
