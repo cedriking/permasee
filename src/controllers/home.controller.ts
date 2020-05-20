@@ -7,15 +7,18 @@ import TransactionService from '../services/transaction';
 import { PoolService } from '../services/pool';
 import { TransactionModel } from '../models/transaction.model';
 import { GrabberStatsModel } from '../models/grabber.model';
+import CacheService from '../services/cache';
 
 moment.locale();
 
 class HomeController implements IControllerBase {
     public path = '/';
     public router = express.Router();
+    private cache: CacheService;
 
     constructor() {
         this.initRoutes();
+        this.cache = new CacheService(60*10);
     }
 
     public initRoutes() {
@@ -25,7 +28,15 @@ class HomeController implements IControllerBase {
     }
 
     async index(req: Request, res: Response) {
-        const rendering = {};
+        let render = await this.cache.get(req.url);
+        let isCached = false;
+        if(render) {
+            isCached = true;
+        } else {
+            render = {};
+        }
+
+        const rendering = render;
         rendering['darkmodeCSS'] = await this.setTheme(req);
         if(rendering['darkmodeCSS']) {
             res.cookie('theme', 'dark');
@@ -33,10 +44,12 @@ class HomeController implements IControllerBase {
             res.clearCookie('theme');
         }
 
-        console.log(req.url);
+        if(isCached) {
+            return res.render('home/index', rendering);
+        }
 
         if(req.query && req.query.search) {
-            rendering['searchTerm'] = req.query.search;
+            rendering['searchTerm'] = req.query.search.toString();
 
             // Do search and add to rendering
             const searchResult = await this.search(req.query.search.toString());
