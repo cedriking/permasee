@@ -193,6 +193,14 @@ class TransactionService {
         body = body.replace(/\n+/g, '\n');
         body = body.replace(/\t+/g, '\t');
 
+        // remove tags that have null, issue on a few results that have a few tags as null
+        const keys = Object.keys(transaction.tags);
+        for(let i = 0, j = keys.length; i < j; i++) {
+            if(transaction.tags[keys[i]] === "null") {
+                delete transaction.tags[keys[i]];
+            }
+        }
+
         const txData = {
             title,
             description,
