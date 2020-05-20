@@ -23,22 +23,22 @@ export class Cache {
         });
 
         this._client.store.ping().then(() => {
-            this._client.deleteAll(); // flush stored data, testing only
+            // this._client.deleteAll(); // flush stored data, testing only
             this.isRedis = true;
         }).catch(e => {
             this._client = MemoryCache;
-            this._client.clear();
+            // this._client.clear();
             this.isRedis = false;
         });
     }
 
     async set(key: string, data: any, ttl: number = 0): Promise<boolean> {
-        const tmpTtl = (ttl || this.ttl) * 1000;
+        const tmpTtl = ttl || this.ttl;
         if(this.isRedis) {
             return await this._client.set(key, data, tmpTtl);
         } 
 
-        return this._client.put(key, data, tmpTtl);
+        return this._client.put(key, data, tmpTtl * 1000);
     }
 
     async get(key: string): Promise<any> {
