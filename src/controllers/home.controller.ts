@@ -7,7 +7,6 @@ import TransactionService from '../services/transaction';
 import { PoolService } from '../services/pool';
 import { TransactionModel } from '../models/transaction.model';
 import { GrabberStatsModel } from '../models/grabber.model';
-import cacheMiddleware from '../middleware/cache';
 
 moment.locale();
 
@@ -20,7 +19,7 @@ class HomeController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get('/', cacheMiddleware((60 * 60)), (req: Request, res: Response) => {
+        this.router.get('/', (req: Request, res: Response) => {
             this.index(req, res);
         });
     }
@@ -33,6 +32,8 @@ class HomeController implements IControllerBase {
         } else {
             res.clearCookie('theme');
         }
+
+        console.log(req.url);
 
         if(req.query && req.query.search) {
             rendering['searchTerm'] = req.query.search;

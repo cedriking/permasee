@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
 import RedisCache from 'node-cache-redis';
 import MemoryCache from 'memory-cache';
 
-export class Cache {
+class CacheService {
     private isRedis: boolean = false;
     private _client: any;
     private ttl: number;
@@ -50,32 +49,4 @@ export class Cache {
     }
 }
 
-const cache = new Cache(60 * 60);
-const cacheMiddleware = (ttl: number) => async (req: Request, res: Response, next: NextFunction) => {
-    let key = `__express__${req.originalUrl}` || req.url;
-    try {
-        const data = await cache.get(key);
-        if(data && data.length) {
-            return res.send(data);
-        }
-    } catch(e) {
-        console.log(e);
-    }
-
-    // @ts-ignore
-    res.sendResponse = res.send;
-    // @ts-ignore
-    res.send = async (body) => {
-        try {
-            await cache.set(key, body);
-        } catch(e) {
-            console.log(e);
-        }
-        
-        // @ts-ignore
-        res.sendResponse(body);
-    }
-    next();
-};
-
-export default cacheMiddleware
+export default CacheService;

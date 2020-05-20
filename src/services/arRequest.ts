@@ -1,19 +1,19 @@
 import axios from 'axios';
 import { IArweaveInfo } from '../interfaces/iarweaveinfo.interface';
-import { Cache } from '../middleware/cache';
+import CacheService from './cache';
 import { PoolService } from './pool';
 
 class ArRequestService {
     private _mainPeer: string = '';
     private peers: string[] = [];
-    private cache: Cache;
+    private cache: CacheService;
 
     get mainPeer() {
         return this._mainPeer;
     }
 
     constructor() {
-        this.cache = new Cache(120); // 2 minutes
+        this.cache = new CacheService(120); // 2 minutes
 
         if(process.env.ARWEAVE_NODE_URL) {
             this._mainPeer = process.env.ARWEAVE_NODE_URL;
