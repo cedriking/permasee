@@ -83,10 +83,10 @@ body
               = obj.es.title
             ul.result-description
               li.sl Permaweb: 
-                a(href=`/out/?id=${obj.tx.id}`)= obj.tx.id
+                a(href=`/out/?id=${obj.tx.id}&t=${searchTermId}`)= obj.tx.id
               if isArchive
                 li(style="width: 70%").sl Source: 
-                  a(href=`/out/?source=${obj.tx.id}`).secondary-color= obj.es.tags['page:url']
+                  a(href=`/out/?source=${obj.tx.id}&t=${searchTermId}`).secondary-color= obj.es.tags['page:url']
               li
                 = isArchive? 'Archived ' : 'Deployed '
                 | by: 

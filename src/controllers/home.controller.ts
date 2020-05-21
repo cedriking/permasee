@@ -2,13 +2,13 @@ import express from 'express';
 import { Request, Response } from 'express';
 import IControllerBase from '../interfaces/icontrollerbase.interface';
 import moment from 'moment';
-import fs from 'fs';
 import TransactionService from '../services/transaction';
 import { PoolService } from '../services/pool';
 import { TransactionModel } from '../models/transaction.model';
 import { GrabberStatsModel } from '../models/grabber.model';
 import CacheService from '../services/cache';
 import { SearchModel } from '../models/search.model';
+import { TermModel, DBTerm } from '../models/term.model';
 
 moment.locale();
 
@@ -50,10 +50,19 @@ class HomeController implements IControllerBase {
         }
 
         if(req.query && req.query.search) {
-            rendering['searchTerm'] = req.query.search.toString();
+            const term = req.query.search.toString();
+            rendering['searchTerm'] = term;
+
+            // Save search term
+            let searchTerm = await TermModel.findOne({ term });
+            if(!searchTerm) {
+                searchTerm = await TermModel.create({ term });
+                await searchTerm.save();
+            }
+            rendering['searchTermId'] = searchTerm._id;
 
             // Do search and add to rendering
-            const searchResult = await this.search(req.query.search.toString());
+            const searchResult = await this.search(term, searchTerm);
             rendering['searchResult'] = searchResult;
         }
 
@@ -109,15 +118,11 @@ class HomeController implements IControllerBase {
         return false;
     }
 
-    async search(term: string, page: number = 0) {
-        // Save search term
-        let dbSearch = await SearchModel.findOne({term});
-        if(dbSearch) {
-            await dbSearch.increment();
-        } else {
-            dbSearch = await SearchModel.create({ term });
-            await dbSearch.save();
-        }
+    async search(term: string, searchTerm: DBTerm, page: number = 0) {
+        
+
+        const dbSearch = await SearchModel.create({ term: searchTerm });
+        await dbSearch.save();
 
         const res = await TransactionService.search(term, page, 25);
         const pool = new PoolService();
