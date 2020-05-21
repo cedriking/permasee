@@ -145,6 +145,7 @@ class TransactionService {
             type: 'webpage',
             size: limit,
             from: start,
+            sort: ['title'],
             body: {
                 query: {
                     multi_match: {
@@ -207,7 +208,8 @@ class TransactionService {
             body,
             txid: transaction.id,
             owner: transaction.owner,
-            tags: transaction.tags
+            tags: transaction.tags,
+            createdAt: new Date(transaction.timestamp * 1000)
         };
 
         return new Promise((resolve, reject) => {

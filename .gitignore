@@ -107,3 +107,6 @@ dist
 
 # Clinic files
 .clinic
+
+# Temporary test
+src/test.ts

@@ -7,7 +7,8 @@
     "build": "tsc -p .",
     "dev": "yarn dev:server",
     "dev:server": "nodemon --watch ./src --exec ts-node -r dotenv/config ./src/server.ts",
-    "dev:grabber": "ts-node -r dotenv/config ./src/bots/grabber.ts"
+    "dev:grabber": "ts-node -r dotenv/config ./src/bots/grabber.ts",
+    "dev:test": "ts-node -r dotenv/config ./src/test.ts"
   },
   "repository": "https://github.com/cedriking/permasnap.git",
   "author": "Cedrik <cedrik@arweave.org>",
