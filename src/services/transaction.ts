@@ -239,7 +239,7 @@ class TransactionService {
         try {
             const tx: DBTransaction = await TransactionModel.create(txData);
             // @ts-ignore
-            tx.save();
+            await tx.save();
         } catch(e) {
             const tx: DBTransaction = await TransactionModel.findOne({id: txData.id});
             for(let key in txData) {

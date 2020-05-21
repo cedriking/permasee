@@ -8,6 +8,7 @@ import { PoolService } from '../services/pool';
 import { TransactionModel } from '../models/transaction.model';
 import { GrabberStatsModel } from '../models/grabber.model';
 import CacheService from '../services/cache';
+import { SearchModel } from '../models/search.model';
 
 moment.locale();
 
@@ -109,6 +110,15 @@ class HomeController implements IControllerBase {
     }
 
     async search(term: string, page: number = 0) {
+        // Save search term
+        let dbSearch = await SearchModel.findOne({term});
+        if(dbSearch) {
+            await dbSearch.increment();
+        } else {
+            dbSearch = await SearchModel.create({ term });
+            await dbSearch.save();
+        }
+
         const res = await TransactionService.search(term, page, 25);
         const pool = new PoolService();
 
