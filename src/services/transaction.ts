@@ -145,7 +145,6 @@ class TransactionService {
             type: 'webpage',
             size: limit,
             from: start,
-            sort: ['title'],
             body: {
                 query: {
                     multi_match: {
