@@ -52,7 +52,7 @@ body
           label(for="search") Search:
           input(id="search", name="search", type="text", value=searchTerm)
 
-        if searchResult
+        if searchResult && true === false
           .results-sort
             | Order by: 
             a.active(href=`?search=${searchTerm}&sort=date`)=' Date '
