@@ -37,9 +37,8 @@ class ArRequestService {
                 }
                 resolve(false);
             }).catch(e => {
-                if(e.code === 'ENETUNREACH' || e.code === 'ECONNREFUSED') {
-                    if(!peer.includes(this._mainPeer)) this.peers.splice(peerIndex, 1);
-                    return reject();
+                if(!peer.includes(this._mainPeer)) {
+                    this.peers.splice(peerIndex, 1);
                 }
                 reject(e);
             });
