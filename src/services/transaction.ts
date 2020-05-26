@@ -139,22 +139,6 @@ class TransactionService {
     }
 
     static async search(term: string, start: number = 0, limit: number = 25, fields: string[] = ['title^3', 'description^2', 'body', 'txid^4', 'owner^4']) {
-        let body = {
-            index: 'transactions',
-            type: 'webpage',
-            size: limit,
-            from: start,
-            body: {
-                query: {
-                    multi_match: {
-                        query: term,
-                        fields,
-                        fuzziness: 2
-                    }
-                }
-            }
-        };
-
         return await TransactionModel.find({$text: {$search: term}}).limit(25);
     }
 

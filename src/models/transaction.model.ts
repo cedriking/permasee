@@ -1,7 +1,7 @@
 import { prop, Typegoose, arrayProp, index } from '@hasezoey/typegoose';
 
 @index({id: 'text'}, {unique: true, weights: {id: 4}})
-@index({owner: 'text', title: 'text', description: 'text', body: 'text'}, {weights: {owner: 4, title: 3, description: 2, body: 1}, partialFilterExpression: { body: { $exists: false } }})
+@index({owner: 'text', title: 'text', description: 'text', body: 'text'}, {weights: {owner: 4, title: 3, description: 2, body: 1}})
 export class DBTransaction extends Typegoose {
     @prop({required: true, unique: true, trim: true})
     id!: string;
