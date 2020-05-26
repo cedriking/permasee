@@ -15,9 +15,9 @@ import loggerMiddleware from './middleware/logger';
 import path from 'path';
 
 import HomeController from './controllers/home.controller';
+import OutController from './controllers/out.controller';
 
 import mongoose from 'mongoose';
-import OutController from './controllers/out.controller';
 mongoose.connect(process.env.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
 let middleWares = [helmet(),

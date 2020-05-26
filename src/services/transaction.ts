@@ -2,8 +2,7 @@ import { arRequestService } from "./arRequest";
 import ITransaction from "../interfaces/transaction.interface";
 import UtilsService from "./utils";
 import { PoolService } from "./pool";
-import { DBTransaction, TransactionModel } from "../models/transaction.model";
-import esClient from "./elastic";
+import { TransactionModel } from "../models/transaction.model";
 import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave/node";
 import Progress from 'cli-progress';
@@ -156,18 +155,15 @@ class TransactionService {
             }
         };
 
-        const res = await esClient.search(body);
-        return res.hits;
+        return await TransactionModel.find({$text: {$search: term}}).limit(25);
     }
 
     static async saveTransaction(tx: ITransaction) {
-        await this.saveToElastic(tx);
         await this.saveToMongo(tx);
-
         return true;
     }
 
-    static async saveToElastic(transaction: ITransaction) {
+    static async saveToMongo(transaction: ITransaction) {
         let title = '';
         try {
             title = transaction.data.toString().match(/<title[^>]*>([^<]+)<\/title>/)[1];
@@ -187,11 +183,9 @@ class TransactionService {
             }
         }
 
-        body = body.replace(/&nbsp;/g, ' ');
-        body = body.replace(/<[^>]*(>|$)|&zwnj;|&raquo;|&laquo;|&gt;/g, '');
-        body = body.replace(/  +/g, ' ');
-        body = body.replace(/\n+/g, '\n');
-        body = body.replace(/\t+/g, '\t');
+        title = await UtilsService.htmlToText(title);
+        description = await UtilsService.htmlToText(description);
+        body = await UtilsService.htmlToText(body);
 
         // remove tags that have null, issue on a few results that have a few tags as null
         const keys = Object.keys(transaction.tags);
@@ -202,51 +196,30 @@ class TransactionService {
         }
 
         const txData = {
-            title,
-            description,
-            body,
-            txid: transaction.id,
-            owner: transaction.owner,
-            tags: transaction.tags,
-            createdAt: new Date(transaction.timestamp * 1000)
-        };
-
-        return new Promise((resolve, reject) => {
-            esClient.index({
-                index: 'transactions',
-                id: transaction.id,
-                type: 'webpage',
-                body: txData
-            }, function(err, resp, status) {
-                //console.log(err, resp, status);
-                if(err) reject(err);
-                resolve();
-            });
-        });
-    }
-
-    static async saveToMongo(transaction: ITransaction) {
-        const txData = {
             id: transaction.id,
             owner: transaction.owner,
             target: transaction.target,
             createdAt: new Date(transaction.timestamp * 1000),
             block_hash: transaction.block_hash,
             block_height: transaction.block_height,
+            title,
+            description,
+            body,
             tags: JSON.stringify(transaction.tags)
         };
 
         try {
-            const tx: DBTransaction = await TransactionModel.create(txData);
-            // @ts-ignore
-            await tx.save();
+            await TransactionModel.create(txData);
         } catch(e) {
-            const tx: DBTransaction = await TransactionModel.findOne({id: txData.id});
-            for(let key in txData) {
-                tx[key] = txData[key];
+            const tx = await TransactionModel.findOne({id: txData.id});
+            if(tx) {
+                for(let key in txData) {
+                    tx[key] = txData[key];
+                }
+                await tx.save();
+            } else {
+                console.log(e);
             }
-            // @ts-ignore
-            tx.save();
         }
 
         return true;

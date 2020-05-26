@@ -119,19 +119,18 @@ class HomeController implements IControllerBase {
     }
 
     async search(term: string, searchTerm: DBTerm, page: number = 0) {
-        
-
         const dbSearch = await SearchModel.create({ term: searchTerm });
         await dbSearch.save();
 
         const res = await TransactionService.search(term, page, 25);
         const pool = new PoolService();
 
-        for(let i = 0, j = res.hits.length; i < j; i++) {
-            pool.add(async () => {
-                const tx = await TransactionModel.findOne({id: res.hits[i]._id});
+        console.log(res, res.length);
 
-                return { es: res.hits[i]['_source'], tx };
+        for(let i = 0, j = res.length; i < j; i++) {
+            pool.add(async () => {
+                res.tags = JSON.parse(res[i].tags);
+                return { es: res[i], tx: res[i] };
             });
         }
 
