@@ -5,7 +5,7 @@ import ITransaction from "../interfaces/transaction.interface";
 import TransactionService from "./transaction";
 import Progress from 'cli-progress';
 
-class BlockService {
+export default class BlockService {
     static async getByHeight(height: number): Promise<IBlock> {
         return arRequestService.get(`/block/height/${height}`);
     }
@@ -81,5 +81,3 @@ class BlockService {
         return transactions;
     }
 }
-
-export default BlockService;

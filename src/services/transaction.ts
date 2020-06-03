@@ -7,7 +7,7 @@ import Transaction from "arweave/node/lib/transaction";
 import Arweave from "arweave/node";
 import Progress from 'cli-progress';
 
-class TransactionService {
+export default class TransactionService {
     private threads = 5;
 
     constructor(threads: number = 5) {
@@ -209,5 +209,3 @@ class TransactionService {
         return true;
     }
 }
-
-export default TransactionService;

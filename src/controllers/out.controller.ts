@@ -7,7 +7,7 @@ import { TermModel } from '../models/term.model';
 import { TransactionModel } from '../models/transaction.model';
 import { ExternalModel, DBExternalType } from '../models/external.model';
 
-class OutController implements IControllerBase {
+export default class OutController implements IControllerBase {
     public path = '/out';
     public router = express.Router();
 
@@ -63,5 +63,3 @@ class OutController implements IControllerBase {
         res.redirect('/');
     }
 }
-
-export default OutController;

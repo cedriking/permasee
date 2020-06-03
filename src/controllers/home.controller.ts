@@ -12,7 +12,7 @@ import { TermModel, DBTerm } from '../models/term.model';
 
 moment.locale();
 
-class HomeController implements IControllerBase {
+export default class HomeController implements IControllerBase {
     public path = '/';
     public router = express.Router();
     private cache: CacheService;
@@ -137,5 +137,3 @@ class HomeController implements IControllerBase {
         return pool.run(10);
     }
 }
-
-export default HomeController;

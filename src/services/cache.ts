@@ -1,7 +1,7 @@
 import RedisCache from 'node-cache-redis';
 import MemoryCache from 'memory-cache';
 
-class CacheService {
+export default class CacheService {
     private isRedis: boolean = false;
     private _client: any;
     private ttl: number;
@@ -48,5 +48,3 @@ class CacheService {
         return this._client.get(key);
     }
 }
-
-export default CacheService;

@@ -2,7 +2,7 @@ import express from 'express'
 import { Application } from 'express'
 import IControllerBase from 'interfaces/icontrollerbase.interface';
 
-class App {
+export default class App {
     public app: Application;
     public port: number;
 
@@ -42,5 +42,3 @@ class App {
         });
     }
 }
-
-export default App

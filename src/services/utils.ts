@@ -1,6 +1,6 @@
 import readline from 'readline';
 
-class UtilsService {
+export default class UtilsService {
     static async pause(timeout = 1000) {
         return new Promise(resolve => {
             setTimeout(() => resolve(), timeout);
@@ -24,5 +24,3 @@ class UtilsService {
         return body;
     }
 }
-
-export default UtilsService;
