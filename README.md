@@ -1,7 +1,7 @@
-# PermaSE
-[PermaSE](https://permase.net) is a [permaweb](https://arweave.org) search engine. Search for all the decentralized and permanent data storage for either archived or deployed webpages to Arweave!
+# PermaSee
+[PermaSee](https://permasee.com) is a [permaweb](https://arweave.org) search engine. Search for all the decentralized and permanent data storage for either archived or deployed webpages to Arweave!
 
-To run your own instance of PermaSE you need to have Node.JS, Mongo, and Redis installed on your server.
+To run your own instance of PermaSee you need to have Node.JS, Mongo, and Redis installed on your server.
 
 ### Environment variables
 ```env

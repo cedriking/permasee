@@ -1,5 +1,5 @@
 {
-  "name": "permasnap",
+  "name": "permasee",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "@babel/core": "^7.9.6",
     "@types/cli-progress": "^3.7.0",
     "@types/express": "^4.17.6",
-    "@types/node": "^13.11.1",
+    "@types/node": "^14.0.9",
     "@types/puppeteer-core": "^2.0.0",
     "node-sass": "^4.14.0",
     "nodemon": "^2.0.3",
