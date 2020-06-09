@@ -25,6 +25,9 @@ head
   link(rel="stylesheet", href="styles/terminal.css")
   link(rel="stylesheet", href="styles/main.css")
 
+  if ackeeDomain && ackeeID
+    script(async, src="#{ackeeDomain}/tracker.js", data-ackee-server=ackeeDomain, data-ackee-domain-id=ackeeID)
+
   if darkmodeCSS
     style= darkmodeCSS
 body

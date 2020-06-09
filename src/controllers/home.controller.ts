@@ -45,6 +45,11 @@ export default class HomeController implements IControllerBase {
             res.clearCookie('theme');
         }
 
+        if(process.env.ACKEE_DOMAIN_ID && process.env.ACKEE_URL) {
+            rendering.ackeeDomain = process.env.ACKEE_URL;
+            rendering.ackeeID = process.env.ACKEE_DOMAIN_ID;
+        }
+
         if(isCached) {
             return res.render('home/index', rendering);
         }
