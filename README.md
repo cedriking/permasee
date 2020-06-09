@@ -10,4 +10,6 @@ ARWEAVE_NODE_URL=<arweave node url>
 REDIS_URL=<redis caching, optional, fallback to memory cache>
 POOL_THREADS=<number, amount of threads to run to get blocks and transactions>
 SENTRY_URL=<optional, Node.JS sentry errors>
+ACKEE_DOMAIN=<optional, ackee stats domain>
+ACKEE_DOMAIN_ID=<optional, domain ID from ackee settings>
 ```
